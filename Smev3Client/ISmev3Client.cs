@@ -40,15 +40,22 @@ namespace Smev3Client
         /// <returns></returns>
         Task<Smev3ClientResponse<GetResponseResponse<TServiceResponse>>> GetResponseAsync<TServiceResponse>(
             Uri namespaceUri, string rootElementLocalName, CancellationToken cancellationToken)
-
             where TServiceResponse : new();
+
+        /// <summary>
+        /// Получение сообщения из очереди входящих запросов
+        /// </summary>
+        /// <param name="namespaceUri">Пространство имён запроса</param>
+        /// <param name="rootElementLocalName">Имя корневого элемента содержательной части запроса</param>
+        /// <param name="cancellationToken">Токен отмены</param>
+        Task<Smev3ClientResponse> GetRequestAsync(Uri namespaceUri, string rootElementLocalName,
+                                            CancellationToken cancellationToken);
 
         /// <summary>
         /// Подтверждение получения ответа
         /// </summary>
         /// <param name="messageId">Ид. подтверждаемого сообщения</param>
         /// <param name="cancellationToken">Токен отмены</param>
-        /// <returns></returns>
         Task<Smev3ClientResponse<AckResponse>> AckAsync(Guid messageId, CancellationToken cancellationToken);
     }
 }

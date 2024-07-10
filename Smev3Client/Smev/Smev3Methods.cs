@@ -4,6 +4,7 @@
     {
         SendRequest,
         GetResponse,
+        GetRequest,
         Ack
     }
 }

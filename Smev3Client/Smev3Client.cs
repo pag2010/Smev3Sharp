@@ -149,6 +149,26 @@ namespace Smev3Client
             return new Smev3ClientResponse<GetResponseResponse<TServiceResponse>>(response.DetachHttpResponse(), data);
         }
 
+        public async Task<Smev3ClientResponse> GetRequestAsync(Uri namespaceUri, string rootElementLocalName, CancellationToken cancellationToken)
+        {
+            ThrowIfDisposed();
+
+            var envelope = new GetRequestRequest(
+                    requestData: new MessageTypeSelector(namespaceUri, rootElementLocalName)
+                    {
+                        Timestamp = DateTime.Now,
+                        Id = "SIGNED_BY_CONSUMER"
+                    },
+                    signer: new Smev3XmlSigner(_algorithm));
+
+            var envelopeBytes = envelope.Get();
+
+            var httpResponse = await SendAsync(envelopeBytes, cancellationToken)
+                                        .ConfigureAwait(false);
+
+            return new Smev3ClientResponse(httpResponse);
+        }
+
         /// <summary>
         /// Подтверждение получения ответа
         /// </summary>
