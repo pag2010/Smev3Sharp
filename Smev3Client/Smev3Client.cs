@@ -10,6 +10,7 @@ using Smev3Client.Utils;
 using Smev3Client.Smev;
 using Smev3Client.Soap;
 using Smev3Client.Http;
+using System.Linq;
 
 namespace Smev3Client
 {
@@ -149,7 +150,16 @@ namespace Smev3Client
             return new Smev3ClientResponse<GetResponseResponse<TServiceResponse>>(response.DetachHttpResponse(), data);
         }
 
-        public async Task<Smev3ClientResponse> GetRequestAsync(Uri namespaceUri, string rootElementLocalName, CancellationToken cancellationToken)
+        /// <summary>
+        /// Получение сообщения из очереди входящих запросов с десериализацией ответа в тип T
+        /// </summary>
+        /// <typeparam name="TServiceResponse"></typeparam>
+        /// <param name="namespaceUri"></param>
+        /// <param name="rootElementLocalName"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
+        public async Task<Smev3ClientResponse<GetRequestResponse<TServiceResponse>>> GetRequestAsync<TServiceResponse>(Uri namespaceUri, string rootElementLocalName, CancellationToken cancellationToken)
+            where TServiceResponse : new()
         {
             ThrowIfDisposed();
 
@@ -166,7 +176,17 @@ namespace Smev3Client
             var httpResponse = await SendAsync(envelopeBytes, cancellationToken)
                                         .ConfigureAwait(false);
 
-            return new Smev3ClientResponse(httpResponse);
+            var parts = await httpResponse.Content.ReadAsMultipartAsync();
+
+            var response = await parts.Contents.First()
+                                 .ReadSoapBodyAsAsync<GetRequestResponse<TServiceResponse>>(cancellationToken);
+
+            for (int i = 1; i < parts.Contents.Count; i++)
+            {
+                response.Attachments.Add(await parts.Contents[i].ReadAsByteArrayAsync());
+            }
+
+            return new Smev3ClientResponse<GetRequestResponse<TServiceResponse>>(httpResponse, response);
         }
 
         /// <summary>

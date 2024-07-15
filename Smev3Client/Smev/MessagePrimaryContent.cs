@@ -7,6 +7,10 @@ using Smev3Client.Xml;
 
 namespace Smev3Client.Smev
 {
+    /// <summary>
+    /// Основной контент сообщения
+    /// </summary>
+    /// <typeparam name="T">Тип сообщения</typeparam>
     public class MessagePrimaryContent<T> :
         IXmlSerializable where T : new()
     {

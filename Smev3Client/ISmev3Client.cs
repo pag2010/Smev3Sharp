@@ -48,8 +48,9 @@ namespace Smev3Client
         /// <param name="namespaceUri">Пространство имён запроса</param>
         /// <param name="rootElementLocalName">Имя корневого элемента содержательной части запроса</param>
         /// <param name="cancellationToken">Токен отмены</param>
-        Task<Smev3ClientResponse> GetRequestAsync(Uri namespaceUri, string rootElementLocalName,
-                                            CancellationToken cancellationToken);
+        Task<Smev3ClientResponse<GetRequestResponse<TServiceRequest>>> GetRequestAsync<TServiceRequest>(
+            Uri namespaceUri, string rootElementLocalName, CancellationToken cancellationToken) 
+            where TServiceRequest : new();
 
         /// <summary>
         /// Подтверждение получения ответа
