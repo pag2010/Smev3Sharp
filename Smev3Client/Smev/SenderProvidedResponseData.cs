@@ -15,6 +15,8 @@ namespace Smev3Client.Smev
 
         public Guid MessageID { get; set; }
 
+        public string To { get; set; }
+
         public RequestRejected[] RequestRejectionResons { get; set; }
 
         public RequestStatus Status { get; set; }
@@ -25,6 +27,31 @@ namespace Smev3Client.Smev
         /// Содержательная часть ответа, XML-документ.
         /// </summary>
         public MessagePrimaryContent<T> MessagePrimaryContent { get; set; }
+
+        /// <summary>
+        /// Содержимое
+        /// </summary>
+        public MessagePrimaryContent<T> Content { get; private set; }
+
+        public SenderProvidedResponseData()
+        {
+        }
+
+        public SenderProvidedResponseData(
+            Guid messageId,
+            string to,
+            string xmlElementId,
+            MessagePrimaryContent<T> content)
+        {
+            MessageID = messageId;
+
+            Content = content
+                ?? throw new ArgumentNullException(nameof(content));
+
+            To = to;
+
+            Id = xmlElementId;
+        }
 
         #region IXmlSerializable
 
@@ -103,7 +130,16 @@ namespace Smev3Client.Smev
 
         public void WriteXml(XmlWriter writer)
         {
-            throw new NotImplementedException();
+            writer.WriteStartElement("SenderProvidedResponseData", Smev3NameSpaces.MESSAGE_EXCHANGE_TYPES_1_2);
+
+            writer.WriteAttributeString("Id", Id);
+
+            writer.WriteElementString("MessageID", MessageID.ToString());
+            writer.WriteElementString("To", To.ToString());
+
+            Content.WriteXml(writer);
+
+            writer.WriteEndElement();
         }
 
         #endregion

@@ -11,6 +11,7 @@ using Smev3Client.Smev;
 using Smev3Client.Soap;
 using Smev3Client.Http;
 using System.Linq;
+using System.Text;
 
 namespace Smev3Client
 {
@@ -216,6 +217,53 @@ namespace Smev3Client
                                         .ConfigureAwait(false);
 
             return new Smev3ClientResponse<AckResponse>(httpResponse, data);
+        }
+
+        public async Task<Smev3ClientResponse<SendResponseResponse>> SendResponseAsync<TServiceRequest>(SendResponseExecutionContext<TServiceRequest> context, string to, CancellationToken cancellationToken) where TServiceRequest : new()
+        {
+            ThrowIfDisposed();
+
+            HttpResponseMessage httpResponse = null;
+            try
+            {
+                var envelope = new SendResponseRequest<TServiceRequest>
+                    (
+                        responseData: new SenderProvidedResponseData<TServiceRequest>(
+                            messageId : Rfc4122.GenerateUUIDv1(),
+                            to: to,
+                            xmlElementId: "SIGNED_BY_CONSUMER",
+                            content: new MessagePrimaryContent<TServiceRequest>(context.ResponseData)
+                            ),
+                        signer: new Smev3XmlSigner(_algorithm)
+                    );
+
+                var envelopeBytes = envelope.Get();
+
+                var str = Encoding.UTF8.GetString(envelopeBytes);
+
+                context.OnBeforeSend?.Invoke(envelopeBytes);
+
+                httpResponse = await SendAsync(envelopeBytes, cancellationToken)
+                                                        .ConfigureAwait(false);
+
+                var strr = await httpResponse
+                                                .Content
+                                                .ReadSoapBodyAsStringAsync(cancellationToken)
+                                                .ConfigureAwait(false);
+
+                var soapEnvelopeBody = await httpResponse
+                                                .Content
+                                                .ReadSoapBodyAsAsync<SendResponseResponse>(cancellationToken)
+                                                .ConfigureAwait(false);
+
+                return new Smev3ClientResponse<SendResponseResponse>(httpResponse, soapEnvelopeBody);
+            }
+            catch
+            {
+                httpResponse?.Dispose();
+
+                throw;
+            }
         }
 
         #region IDisposable

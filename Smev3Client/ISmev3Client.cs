@@ -58,5 +58,18 @@ namespace Smev3Client
         /// <param name="messageId">Ид. подтверждаемого сообщения</param>
         /// <param name="cancellationToken">Токен отмены</param>
         Task<Smev3ClientResponse<AckResponse>> AckAsync(Guid messageId, CancellationToken cancellationToken);
+
+        /// <summary>
+        /// Отправка ответа
+        /// </summary>
+        /// <typeparam name="TServiceRequest"></typeparam>
+        /// <param name="context">Параметры метода</param>
+        /// <param name="to">Получатель</param>
+        /// <param name="cancellationToken">Токен отмены</param>
+        /// <returns></returns>
+        Task<Smev3ClientResponse<SendResponseResponse>> SendResponseAsync<TServiceRequest>(
+            SendResponseExecutionContext<TServiceRequest> context, string to, CancellationToken cancellationToken)
+
+            where TServiceRequest : new();
     }
 }

@@ -5,6 +5,7 @@
         SendRequest,
         GetResponse,
         GetRequest,
-        Ack
+        Ack,
+        SendResponse
     }
 }

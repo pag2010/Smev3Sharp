@@ -12,9 +12,9 @@ using Smev3Client.Soap;
 
 namespace Smev3Client.Http
 {
-    internal static class HttpContentExtensions
+    public static class HttpContentExtensions
     {
-        internal static async Task<T> ReadSoapBodyAsAsync<T>(
+        public static async Task<T> ReadSoapBodyAsAsync<T>(
             this HttpContent httpContent, CancellationToken cancellationToken)
             where T : ISoapEnvelopeBody, new()
         {
