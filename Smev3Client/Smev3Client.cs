@@ -11,9 +11,6 @@ using Smev3Client.Smev;
 using Smev3Client.Soap;
 using Smev3Client.Http;
 using System.Linq;
-using System.Text;
-using System.Buffers.Text;
-using System.IO;
 
 namespace Smev3Client
 {
