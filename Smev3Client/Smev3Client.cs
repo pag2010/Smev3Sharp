@@ -12,6 +12,8 @@ using Smev3Client.Soap;
 using Smev3Client.Http;
 using System.Linq;
 using System.Text;
+using System.Buffers.Text;
+using System.IO;
 
 namespace Smev3Client
 {
@@ -219,7 +221,7 @@ namespace Smev3Client
             return new Smev3ClientResponse<AckResponse>(httpResponse, data);
         }
 
-        public async Task<Smev3ClientResponse<SendResponseResponse>> SendResponseAsync<TServiceRequest>(SendResponseExecutionContext<TServiceRequest> context, string to, CancellationToken cancellationToken) where TServiceRequest : new()
+        public async Task<Smev3ClientResponse<SendResponseResponse>> SendResponseAsync<TServiceRequest>(SendResponseExecutionContext<TServiceRequest> context, CancellationToken cancellationToken) where TServiceRequest : new()
         {
             ThrowIfDisposed();
 
@@ -230,8 +232,9 @@ namespace Smev3Client
                     (
                         responseData: new SenderProvidedResponseData<TServiceRequest>(
                             messageId : Rfc4122.GenerateUUIDv1(),
-                            to: to,
-                            xmlElementId: "SIGNED_BY_CONSUMER",
+                            to: context.To,
+                            xmlElementId: "SIGNED_BY_CALLER",
+                            attachments: context.Attachments,
                             content: new MessagePrimaryContent<TServiceRequest>(context.ResponseData)
                             ),
                         signer: new Smev3XmlSigner(_algorithm)
@@ -239,17 +242,10 @@ namespace Smev3Client
 
                 var envelopeBytes = envelope.Get();
 
-                var str = Encoding.UTF8.GetString(envelopeBytes);
-
                 context.OnBeforeSend?.Invoke(envelopeBytes);
 
                 httpResponse = await SendAsync(envelopeBytes, cancellationToken)
                                                         .ConfigureAwait(false);
-
-                var strr = await httpResponse
-                                                .Content
-                                                .ReadSoapBodyAsStringAsync(cancellationToken)
-                                                .ConfigureAwait(false);
 
                 var soapEnvelopeBody = await httpResponse
                                                 .Content

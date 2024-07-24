@@ -1,6 +1,5 @@
-﻿namespace InludeAttachmentContent
+﻿namespace Base64Content
 {
-
     /// <remarks/>
     [System.SerializableAttribute()]
     [System.ComponentModel.DesignerCategoryAttribute("code")]
@@ -10,7 +9,7 @@
 
         private string idField;
 
-        private AttachmentContentListAttachmentContentContent contentField;
+        private string contentField;
 
         /// <remarks/>
         public string Id
@@ -26,7 +25,7 @@
         }
 
         /// <remarks/>
-        public AttachmentContentListAttachmentContentContent Content
+        public string Content
         {
             get
             {
@@ -35,55 +34,6 @@
             set
             {
                 this.contentField = value;
-            }
-        }
-    }
-
-    /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2")]
-    public partial class AttachmentContentListAttachmentContentContent
-    {
-
-        private Include includeField;
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlElementAttribute(Namespace = "http://www.w3.org/2004/08/xop/include")]
-        public Include Include
-        {
-            get
-            {
-                return this.includeField;
-            }
-            set
-            {
-                this.includeField = value;
-            }
-        }
-    }
-
-    /// <remarks/>
-    [System.SerializableAttribute()]
-    [System.ComponentModel.DesignerCategoryAttribute("code")]
-    [System.Xml.Serialization.XmlTypeAttribute(AnonymousType = true, Namespace = "http://www.w3.org/2004/08/xop/include")]
-    [System.Xml.Serialization.XmlRootAttribute(Namespace = "http://www.w3.org/2004/08/xop/include", IsNullable = false)]
-    public partial class Include
-    {
-
-        private string hrefField;
-
-        /// <remarks/>
-        [System.Xml.Serialization.XmlAttributeAttribute()]
-        public string href
-        {
-            get
-            {
-                return this.hrefField;
-            }
-            set
-            {
-                this.hrefField = value;
             }
         }
     }

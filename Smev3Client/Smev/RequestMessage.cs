@@ -2,7 +2,7 @@
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-
+using InludeAttachmentContent;
 using Smev3Client.Xml;
 
 namespace Smev3Client.Smev

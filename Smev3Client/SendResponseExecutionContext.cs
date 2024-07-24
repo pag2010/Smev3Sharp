@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Smev3Client
 {
@@ -13,5 +14,8 @@ namespace Smev3Client
         /// Вызывается перед отправкой пакета в СМЭВ
         /// </summary>
         public Action<ReadOnlyMemory<byte>> OnBeforeSend { get; set; }
+
+        public string To { get; set; }
+        public List<Attachment> Attachments { get; set; }
     }
 }

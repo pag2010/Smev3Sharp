@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
-
+using Base64Content;
 using Smev3Client.Xml;
 
 namespace Smev3Client.Smev
@@ -33,6 +35,9 @@ namespace Smev3Client.Smev
         /// </summary>
         public MessagePrimaryContent<T> Content { get; private set; }
 
+        public AttachmentHeaderList AttachmentHeaderList { get; set; }
+        public AttachmentContentList AttachmentContentList { get; set; }
+
         public SenderProvidedResponseData()
         {
         }
@@ -41,6 +46,7 @@ namespace Smev3Client.Smev
             Guid messageId,
             string to,
             string xmlElementId,
+            List<Attachment> attachments,
             MessagePrimaryContent<T> content)
         {
             MessageID = messageId;
@@ -51,6 +57,31 @@ namespace Smev3Client.Smev
             To = to;
 
             Id = xmlElementId;
+
+
+            var attachmentHeaderList = new AttachmentHeaderList();
+            attachmentHeaderList.AttachmentHeader = attachments.Select(a =>
+            {
+                return new AttachmentHeaderListAttachmentHeader()
+                {
+                    contentId = a.Name,
+                    MimeType = a.MimeType,
+                    SignaturePKCS7 = Convert.ToBase64String(a.SignatureData)
+                };
+            }).ToArray();
+
+            var attachmentContentList = new AttachmentContentList();
+            attachmentContentList.AttachmentContent = attachments.Select(a =>
+            {
+                return new AttachmentContentListAttachmentContent()
+                {
+                    Id = a.Name,
+                    Content = Convert.ToBase64String(a.Data)
+                };
+            }).ToArray();
+
+            AttachmentHeaderList = attachmentHeaderList;
+            AttachmentContentList = attachmentContentList;
         }
 
         #region IXmlSerializable
@@ -72,7 +103,7 @@ namespace Smev3Client.Smev
 
                     respReader.ReadElementIfItCurrentOrRequired(
                         "To", Smev3NameSpaces.MESSAGE_EXCHANGE_TYPES_1_2, required: true,
-                        (r) => r.Skip());
+                        (r) => To = r.ReadElementContentAsString());
 
                     respReader.ReadElementIfItCurrentOrRequired(
                         "MessagePrimaryContent", Smev3NameSpaces.MESSAGE_EXCHANGE_TYPES_BASIC_1_2, required: false,
@@ -139,7 +170,13 @@ namespace Smev3Client.Smev
 
             Content.WriteXml(writer);
 
+            var serializer = new XmlSerializer(typeof(AttachmentHeaderList));
+            serializer.Serialize(writer, AttachmentHeaderList);
+
             writer.WriteEndElement();
+
+            var serializer2 = new XmlSerializer(typeof(AttachmentContentList));
+            serializer2.Serialize(writer, AttachmentContentList);
         }
 
         #endregion

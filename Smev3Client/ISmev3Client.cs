@@ -68,7 +68,7 @@ namespace Smev3Client
         /// <param name="cancellationToken">Токен отмены</param>
         /// <returns></returns>
         Task<Smev3ClientResponse<SendResponseResponse>> SendResponseAsync<TServiceRequest>(
-            SendResponseExecutionContext<TServiceRequest> context, string to, CancellationToken cancellationToken)
+            SendResponseExecutionContext<TServiceRequest> context, CancellationToken cancellationToken)
 
             where TServiceRequest : new();
     }
