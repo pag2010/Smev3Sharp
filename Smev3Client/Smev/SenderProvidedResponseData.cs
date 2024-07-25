@@ -103,7 +103,7 @@ namespace Smev3Client.Smev
 
                     respReader.ReadElementIfItCurrentOrRequired(
                         "To", Smev3NameSpaces.MESSAGE_EXCHANGE_TYPES_1_2, required: true,
-                        (r) => To = r.ReadElementContentAsString());
+                        (r) => r.Skip());
 
                     respReader.ReadElementIfItCurrentOrRequired(
                         "MessagePrimaryContent", Smev3NameSpaces.MESSAGE_EXCHANGE_TYPES_BASIC_1_2, required: false,

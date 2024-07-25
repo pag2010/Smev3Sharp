@@ -18,6 +18,8 @@ namespace Smev3Client.Smev
 
         public MessageMetadata MessageMetadata { get; set; }
 
+        public string ReplyTo { get; set; }
+
         #region IXmlSerializable
 
         public XmlSchema GetSchema()
@@ -38,6 +40,8 @@ namespace Smev3Client.Smev
                     var messageMetadata = new MessageMetadata();
 
                     messageMetadata.ReadXml(requestReader);
+
+                    requestReader.ReadElementIfItCurrentOrRequired("ReplyTo", Smev3NameSpaces.MESSAGE_EXCHANGE_TYPES_1_2, true, (r) => ReplyTo = r.ReadElementContentAsString());
 
                     MessageMetadata = messageMetadata;
                     SenderProvidedRequestData = senderProvidedRequestData;
