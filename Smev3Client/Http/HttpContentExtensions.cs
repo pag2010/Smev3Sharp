@@ -40,6 +40,11 @@ namespace Smev3Client.Http
             var stream = await httpContent.ReadSoapBodyAsStreamAsync(cancellationToken)
                                             .ConfigureAwait(false);
 
+            if (stream.CanSeek && stream.Position != 0)
+            {
+                stream.Seek(0, SeekOrigin.Begin);
+            }
+
             using var streamReader = new StreamReader(stream, Encoding.UTF8);
 
             return await streamReader.ReadToEndAsync();
