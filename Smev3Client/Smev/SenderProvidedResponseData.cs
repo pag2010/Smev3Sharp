@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Xml;
 using System.Xml.Schema;
 using System.Xml.Serialization;
@@ -61,24 +60,20 @@ namespace Smev3Client.Smev
 
             var attachmentHeaderList = new AttachmentHeaderList();
             attachmentHeaderList.AttachmentHeader = attachments.Select(a =>
-            {
-                return new AttachmentHeaderListAttachmentHeader()
-                {
-                    contentId = a.Name,
-                    MimeType = a.MimeType,
-                    SignaturePKCS7 = Convert.ToBase64String(a.SignatureData)
-                };
-            }).ToArray();
+                 new AttachmentHeaderListAttachmentHeader()
+                 {
+                     contentId = a.Name,
+                     MimeType = a.MimeType,
+                     SignaturePKCS7 = Convert.ToBase64String(a.SignatureData)
+                 }).ToArray();
 
             var attachmentContentList = new AttachmentContentList();
             attachmentContentList.AttachmentContent = attachments.Select(a =>
-            {
-                return new AttachmentContentListAttachmentContent()
+                new AttachmentContentListAttachmentContent()
                 {
                     Id = a.Name,
                     Content = Convert.ToBase64String(a.Data)
-                };
-            }).ToArray();
+                }).ToArray();
 
             AttachmentHeaderList = attachmentHeaderList;
             AttachmentContentList = attachmentContentList;
@@ -170,13 +165,19 @@ namespace Smev3Client.Smev
 
             Content.WriteXml(writer);
 
-            var serializer = new XmlSerializer(typeof(AttachmentHeaderList));
-            serializer.Serialize(writer, AttachmentHeaderList);
+            if (AttachmentHeaderList.AttachmentHeader.Any())
+            {
+                var serializer = new XmlSerializer(typeof(AttachmentHeaderList));
+                serializer.Serialize(writer, AttachmentHeaderList);
+            }
 
             writer.WriteEndElement();
 
-            var serializer2 = new XmlSerializer(typeof(AttachmentContentList));
-            serializer2.Serialize(writer, AttachmentContentList);
+            if (AttachmentContentList.AttachmentContent.Any())
+            {
+                var serializer2 = new XmlSerializer(typeof(AttachmentContentList));
+                serializer2.Serialize(writer, AttachmentContentList);
+            }
         }
 
         #endregion
